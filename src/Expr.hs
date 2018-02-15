@@ -5,12 +5,12 @@ import          Data.String
 
 type SyntaxError = String
 
-data Expr = Val Int
-          | Plus Expr Expr
-          | Sub Expr Expr
+data Expr = Val Double
           | Mul Expr Expr
           | Div Expr Expr
-  deriving (Eq, Show)
+          | Plus Expr Expr
+          | Sub Expr Expr
+           deriving (Eq, Show)
 
 arithmetic :: String -> String
 arithmetic s =
@@ -37,12 +37,12 @@ arithParser cs =
 
 intParser :: String -> Either SyntaxError (Expr, String)
 intParser (c:rest)
-  | isDigit c = intParser' (ord c - ord '0') rest
+  | isDigit c = intParser' (fromIntegral(ord c - ord '0')) rest
   | otherwise = Left ("syntax error in '" ++ (c:rest) ++ "', expected Expr digit")
   where
-    intParser' :: Int -> String -> Either SyntaxError (Expr, String)
+    intParser' :: Double -> String -> Either SyntaxError (Expr, String)
     intParser' n (c:cs)
-      | isDigit c = intParser' (n * 10 + (ord c - ord '0')) cs
+      | isDigit c = intParser' (n * 10 + (fromIntegral(ord c - ord '0'))) cs
       | otherwise = Right (Val n, c:cs)
     intParser' n [] = Right (Val n, [])
 intParser [] = Left ("syntax error in'" ++ [] ++ "', expected a digit")
@@ -54,9 +54,9 @@ signParser ('*':rest) = Right (Mul, rest)
 signParser ('/':rest) = Right (Div, rest)
 signParser s        = Left ("syntax error in '" ++ s ++  "', expected [+|-|*|/]")
 
-evalExpr :: Expr -> Int
+evalExpr :: Expr -> Double
 evalExpr (Plus v1 v2) = evalExpr v1 + evalExpr v2
 evalExpr (Sub v1 v2)  = evalExpr v1 - evalExpr v2
 evalExpr (Mul v1 v2)  = evalExpr v1 * evalExpr v2
-evalExpr (Div v1 v2)  = evalExpr v1 `div` evalExpr v2
+evalExpr (Div v1 v2)  = evalExpr v1 / evalExpr v2
 evalExpr (Val v1)     = v1
