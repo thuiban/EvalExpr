@@ -10,6 +10,7 @@ data Expr = Val Double
           | Div Expr Expr
           | Plus Expr Expr
           | Sub Expr Expr
+          | Pow Expr Expr
            deriving (Eq, Show)
 
 arithmetic :: String -> String
@@ -52,6 +53,7 @@ signParser ('+':rest) = Right (Plus, rest)
 signParser ('-':rest) = Right (Sub, rest)
 signParser ('*':rest) = Right (Mul, rest)
 signParser ('/':rest) = Right (Div, rest)
+signParser ('^':rest) = Right (Pow, rest)
 signParser s        = Left ("syntax error in '" ++ s ++  "', expected [+|-|*|/]")
 
 evalExpr :: Expr -> Double
@@ -59,4 +61,16 @@ evalExpr (Plus v1 v2) = evalExpr v1 + evalExpr v2
 evalExpr (Sub v1 v2)  = evalExpr v1 - evalExpr v2
 evalExpr (Mul v1 v2)  = evalExpr v1 * evalExpr v2
 evalExpr (Div v1 v2)  = evalExpr v1 / evalExpr v2
+evalExpr (Pow v1 v2)  = evalExpr v1 `pow` evalExpr v2 
 evalExpr (Val v1)     = v1
+
+
+pow :: Double -> Double -> Double
+pow base 0 = base
+pow base pui  = pow2  base (pui - 1) base
+        where
+          pow2 :: Double -> Double -> Double -> Double
+          pow2 base pui res =
+            if pui > 0
+               then pow2 base (pui - 1) (res*base)
+               else res

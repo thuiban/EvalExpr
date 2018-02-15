@@ -57,9 +57,6 @@ spec = describe "Analyseur syntaxique d'additions à 1 chiffre" $ do
     it "analyse un chiffre comme un entier" $
       property $ analyseSingleDigit
 
-    it "analyse plusieurs chiffres comme un entier" $
-      property $ analyseDigitString
-
     it "analyse un non-digit comme une syntaxerror" $
       intParser "a" `shouldSatisfy` isLeft
 
